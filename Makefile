@@ -1,8 +1,9 @@
 
-LOCAL_IMAGE ?= sandbox-ai-consumer:0.1.0
+LOCAL_IMAGE ?= local:latest
+TARGET_TAG ?= 0.1.1
 OWNER ?= RobertKustra
 OWNER_LC := $(shell printf '%s' "$(OWNER)" | tr '[:upper:]' '[:lower:]')
-IMAGE ?= ghcr.io/$(OWNER_LC)/dev/sandbox-ai-consumer:0.1.0
+IMAGE ?= ghcr.io/$(OWNER_LC)/dev/sandbox-ai-consumer:$(TARGET_TAG)
 
 .PHONY: help check-git-clean build push
 
