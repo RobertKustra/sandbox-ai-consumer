@@ -1,14 +1,16 @@
 
-IMAGE ?= ghcr.io/robertkustra/dev/sandbox-ai-consumer:0.1.0
+LOCAL_IMAGE ?= sandbox-ai-consumer:0.1.0
+IMAGE ?= ghcr.io/RobertKustra/dev/sandbox-ai-consumer:0.1.0
 
 .PHONY: help check-git-clean build push
 
 help:
 	@echo "Available targets:"
-	@echo "  make build    - Build Docker image after git clean check"
-	@echo "  make push     - Build and push Docker image"
+	@echo "  make build    - Build local Docker image after git clean check"
+	@echo "  make push     - Retag local image to IMAGE and push"
 	@echo "  make check-git-clean - Fail if working tree has uncommitted changes"
-	@echo "  IMAGE=<ref> make build|push - Override image reference"
+	@echo "  LOCAL_IMAGE=<ref> make build - Override local image reference"
+	@echo "  IMAGE=<ref> make push - Override target image reference"
 
 check-git-clean:
 	@if [ -n "$(shell git status --porcelain)" ]; then \
@@ -18,7 +20,8 @@ check-git-clean:
 	fi
 
 build: check-git-clean
-	docker build -t $(IMAGE) .
+	docker build -t $(LOCAL_IMAGE) .
 
 push: build
+	docker tag $(LOCAL_IMAGE) $(IMAGE)
 	docker push $(IMAGE)
