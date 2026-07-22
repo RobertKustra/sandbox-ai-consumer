@@ -114,15 +114,15 @@ def run_single(base_url: str, model: str, prompt: str) -> int:
     if status_code == 200:
         content = extract_content(body)
         if content is not None:
-            print(content)
+            LOGGER.info("response: %s", content)
         else:
-            print(body)
+            LOGGER.info("response: %s", body)
     else:
         try:
             parsed = json.loads(body)
-            print(json.dumps(parsed, ensure_ascii=False, indent=2))
+            LOGGER.error("error response: %s", json.dumps(parsed, ensure_ascii=False, indent=2))
         except json.JSONDecodeError:
-            print(body)
+            LOGGER.error("error response: %s", body)
 
     return 0 if status_code == 200 else 1
 
@@ -135,7 +135,7 @@ def run_stress(base_url: str, model: str, count: int, parallel: int) -> int:
         payload = {
             "model": model,
             "messages": [
-                {"role": "user", "content": f"Test #{i}: napisz 6 nie powtarzajacych sie slow o AI"}
+                {"role": "user", "content": f"Test #{i}: write 6 distinct words about AI"}
             ],
             "temperature": 0.7,
             "max_tokens": 64,
@@ -164,9 +164,9 @@ def run_stress(base_url: str, model: str, count: int, parallel: int) -> int:
             if result.status_code != 200:
                 failures += 1
 
-    print("\nStatus summary:")
+    LOGGER.info("status summary:")
     for status_code in sorted(summary):
-        print(f"{status_code} {summary[status_code]}")
+        LOGGER.info("%s %s", status_code, summary[status_code])
 
     return 0 if failures == 0 else 1
 
