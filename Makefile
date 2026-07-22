@@ -1,4 +1,5 @@
-IMAGE ?= ghcr.io/<owner>/dev/sandbox-ai-consumer:0.1.0
+
+IMAGE ?= ghcr.io/RobertKustra/dev/sandbox-ai-consumer:0.1.0
 
 .PHONY: help check-git-clean build push
 
