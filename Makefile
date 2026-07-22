@@ -1,6 +1,6 @@
 
 LOCAL_IMAGE ?= local:latest
-TARGET_TAG ?= 0.1.2
+TARGET_TAG ?= 0.2.0
 OWNER ?= RobertKustra
 OWNER_LC := $(shell printf '%s' "$(OWNER)" | tr '[:upper:]' '[:lower:]')
 IMAGE ?= ghcr.io/$(OWNER_LC)/dev/sandbox-ai-consumer:$(TARGET_TAG)
