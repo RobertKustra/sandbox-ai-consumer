@@ -6,17 +6,55 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import os
 import time
 import urllib.error
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Dict
 
 DEFAULT_PROMPT = "Who are you?, and what can you do?"
 DEFAULT_BASE_URL = "http://127.0.0.1:8000"
 DEFAULT_MODEL = "Qwen/Qwen2.5-Coder-3B-Instruct"
 LOGGER = logging.getLogger("vllm_request")
+ENV_FILE = ".env"
+
+
+def parse_bool(value: str | None, default: bool = False) -> bool:
+    if value is None:
+        return default
+    return value.strip().lower() in {"1", "true", "yes", "on"}
+
+
+def parse_int(value: str | None, default: int) -> int:
+    if value is None or value.strip() == "":
+        return default
+    try:
+        return int(value)
+    except ValueError:
+        LOGGER.warning("invalid integer value '%s', using default %s", value, default)
+        return default
+
+
+def load_dotenv(path: str) -> None:
+    dotenv_path = Path(path)
+    if not dotenv_path.exists():
+        return
+
+    for raw_line in dotenv_path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+
+        key, value = line.split("=", 1)
+        key = key.strip()
+        value = value.strip().strip('"').strip("'")
+
+        if key:
+            # Keep explicit environment variables as higher priority than .env values.
+            os.environ.setdefault(key, value)
 
 
 @dataclass
@@ -134,42 +172,64 @@ def run_stress(base_url: str, model: str, count: int, parallel: int) -> int:
 
 
 def parse_args() -> argparse.Namespace:
+    bootstrap_parser = argparse.ArgumentParser(add_help=False)
+    bootstrap_parser.add_argument(
+        "--env-file",
+        default=ENV_FILE,
+        help=f"path to .env file (default: {ENV_FILE})",
+    )
+    bootstrap_args, _ = bootstrap_parser.parse_known_args()
+    load_dotenv(bootstrap_args.env_file)
+
+    default_base_url = os.getenv("VLLM_BASE_URL", DEFAULT_BASE_URL)
+    default_model = os.getenv("VLLM_MODEL", DEFAULT_MODEL)
+    default_prompt = os.getenv("VLLM_PROMPT", DEFAULT_PROMPT)
+    default_stress = parse_bool(os.getenv("VLLM_STRESS"), default=False)
+    default_count = parse_int(os.getenv("VLLM_COUNT"), default=50)
+    default_parallel = parse_int(os.getenv("VLLM_PARALLEL"), default=8)
+
     parser = argparse.ArgumentParser(
         description="vLLM request helper: single chat completion or optional stress test."
     )
     parser.add_argument(
+        "--env-file",
+        default=bootstrap_args.env_file,
+        help=f"path to .env file (default: {ENV_FILE})",
+    )
+    parser.add_argument(
         "-u",
         "--base-url",
-        default=DEFAULT_BASE_URL,
-        help=f"vLLM base URL (default: {DEFAULT_BASE_URL})",
+        default=default_base_url,
+        help=f"vLLM base URL (env: VLLM_BASE_URL, default: {DEFAULT_BASE_URL})",
     )
     parser.add_argument(
         "--model",
-        default=DEFAULT_MODEL,
-        help=f"model name (default: {DEFAULT_MODEL})",
+        default=default_model,
+        help=f"model name (env: VLLM_MODEL, default: {DEFAULT_MODEL})",
     )
     parser.add_argument(
         "-p",
         "--prompt",
-        default=DEFAULT_PROMPT,
+        default=default_prompt,
         help="question for single mode",
     )
     parser.add_argument(
         "--stress",
         action="store_true",
+        default=default_stress,
         help="run parallel stress test instead of single request",
     )
     parser.add_argument(
         "--count",
         type=int,
-        default=50,
-        help="number of requests for stress mode (default: 50)",
+        default=default_count,
+        help="number of requests for stress mode (env: VLLM_COUNT, default: 50)",
     )
     parser.add_argument(
         "--parallel",
         type=int,
-        default=8,
-        help="number of parallel workers for stress mode (default: 8)",
+        default=default_parallel,
+        help="number of parallel workers for stress mode (env: VLLM_PARALLEL, default: 8)",
     )
     return parser.parse_args()
 

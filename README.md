@@ -2,6 +2,36 @@
 
 Simple vLLM consumer script with Docker and Make automation.
 
+## Configuration via .env
+
+The script loads values from `.env` in the current directory by default.
+
+Supported variables:
+
+- `VLLM_BASE_URL`
+- `VLLM_MODEL`
+- `VLLM_PROMPT`
+- `VLLM_STRESS` (`true`/`false`, `1`/`0`, `yes`/`no`)
+- `VLLM_COUNT`
+- `VLLM_PARALLEL`
+
+Example `.env`:
+
+```env
+VLLM_BASE_URL=http://127.0.0.1:8000
+VLLM_MODEL=Qwen/Qwen2.5-Coder-3B-Instruct
+VLLM_PROMPT=Write a short hello message
+VLLM_STRESS=false
+VLLM_COUNT=50
+VLLM_PARALLEL=8
+```
+
+You can also use a custom file path:
+
+`./ai-consumer.py --env-file .env.dev`
+
+CLI arguments still override values loaded from `.env`.
+
 ## Build and push image
 
 Default image references:
