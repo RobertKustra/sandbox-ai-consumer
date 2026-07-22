@@ -171,6 +171,33 @@ def run_stress(base_url: str, model: str, count: int, parallel: int) -> int:
     return 0 if failures == 0 else 1
 
 
+def run_repeating(task_name: str, interval_minutes: float, task: callable) -> int:
+    if interval_minutes <= 0:
+        return task()
+
+    interval_seconds = interval_minutes * 60.0
+    cycle = 1
+
+    try:
+        while True:
+            started_at = time.time()
+            LOGGER.info("cycle %s started (%s mode)", cycle, task_name)
+            exit_code = task()
+            if exit_code != 0:
+                LOGGER.warning("cycle %s finished with code %s", cycle, exit_code)
+            else:
+                LOGGER.info("cycle %s finished successfully", cycle)
+
+            cycle += 1
+            next_run_at = started_at + interval_seconds
+            sleep_for = max(0.0, next_run_at - time.time())
+            LOGGER.info("next cycle in %.2f minute(s)", sleep_for / 60.0)
+            time.sleep(sleep_for)
+    except KeyboardInterrupt:
+        LOGGER.info("stopped by user")
+        return 130
+
+
 def parse_args() -> argparse.Namespace:
     bootstrap_parser = argparse.ArgumentParser(add_help=False)
     bootstrap_parser.add_argument(
@@ -187,6 +214,7 @@ def parse_args() -> argparse.Namespace:
     default_stress = parse_bool(os.getenv("VLLM_STRESS"), default=False)
     default_count = parse_int(os.getenv("VLLM_COUNT"), default=50)
     default_parallel = parse_int(os.getenv("VLLM_PARALLEL"), default=8)
+    default_repeat_minutes = float(os.getenv("VLLM_REPEAT_MINUTES", "0"))
 
     parser = argparse.ArgumentParser(
         description="vLLM request helper: single chat completion or optional stress test."
@@ -231,6 +259,12 @@ def parse_args() -> argparse.Namespace:
         default=default_parallel,
         help="number of parallel workers for stress mode (env: VLLM_PARALLEL, default: 8)",
     )
+    parser.add_argument(
+        "--repeat-minutes",
+        type=float,
+        default=default_repeat_minutes,
+        help="repeat full cycle every N minutes for single or stress mode (env: VLLM_REPEAT_MINUTES, default: 0 - disabled)",
+    )
     return parser.parse_args()
 
 
@@ -239,9 +273,17 @@ def main() -> int:
     args = parse_args()
 
     if args.stress:
-        return run_stress(args.base_url, args.model, args.count, args.parallel)
+        return run_repeating(
+            task_name="stress",
+            interval_minutes=args.repeat_minutes,
+            task=lambda: run_stress(args.base_url, args.model, args.count, args.parallel),
+        )
 
-    return run_single(args.base_url, args.model, args.prompt)
+    return run_repeating(
+        task_name="single",
+        interval_minutes=args.repeat_minutes,
+        task=lambda: run_single(args.base_url, args.model, args.prompt),
+    )
 
 
 if __name__ == "__main__":

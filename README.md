@@ -14,6 +14,7 @@ Supported variables:
 - `VLLM_STRESS` (`true`/`false`, `1`/`0`, `yes`/`no`)
 - `VLLM_COUNT`
 - `VLLM_PARALLEL`
+- `VLLM_REPEAT_MINUTES` (`0` disables repeating)
 
 Example `.env`:
 
@@ -24,6 +25,7 @@ VLLM_PROMPT=Write a short hello message
 VLLM_STRESS=false
 VLLM_COUNT=50
 VLLM_PARALLEL=8
+VLLM_REPEAT_MINUTES=0
 ```
 
 You can also use a custom file path:
@@ -31,6 +33,12 @@ You can also use a custom file path:
 `./ai-consumer.py --env-file .env.dev`
 
 CLI arguments still override values loaded from `.env`.
+
+Repeat execution examples:
+
+- Repeat single request every 5 minutes: `./ai-consumer.py --repeat-minutes 5`
+- Repeat stress cycle every 10 minutes: `./ai-consumer.py --stress --count 20 --parallel 4 --repeat-minutes 10`
+- Stop repeating with `Ctrl+C`
 
 ## Build and push image
 
