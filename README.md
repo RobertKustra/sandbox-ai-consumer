@@ -7,7 +7,8 @@ Simple vLLM consumer script with Docker and Make automation.
 Default image references:
 
 - Local build tag: `sandbox-ai-consumer:0.1.0`
-- Push target tag: `ghcr.io/robertkustra/dev/sandbox-ai-consumer:0.1.0`
+- GitHub owner: `RobertKustra`
+- Push target tag: `ghcr.io/robertkustra/dev/sandbox-ai-consumer:0.1.0` (lowercase required by Docker image naming)
 
 Available targets:
 
@@ -21,6 +22,7 @@ there are uncommitted changes in the working tree.
 Override image references:
 
 - `LOCAL_IMAGE=my-local-tag:latest make build`
+- `OWNER=RobertKustra make push`
 - `IMAGE=ghcr.io/my-org/sandbox-ai-consumer:0.1.0 make push`
 
 ## Docker commands

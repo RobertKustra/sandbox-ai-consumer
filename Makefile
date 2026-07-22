@@ -1,6 +1,8 @@
 
 LOCAL_IMAGE ?= sandbox-ai-consumer:0.1.0
-IMAGE ?= ghcr.io/RobertKustra/dev/sandbox-ai-consumer:0.1.0
+OWNER ?= RobertKustra
+OWNER_LC := $(shell printf '%s' "$(OWNER)" | tr '[:upper:]' '[:lower:]')
+IMAGE ?= ghcr.io/$(OWNER_LC)/dev/sandbox-ai-consumer:0.1.0
 
 .PHONY: help check-git-clean build push
 
@@ -9,6 +11,7 @@ help:
 	@echo "  make build    - Build local Docker image after git clean check"
 	@echo "  make push     - Retag local image to IMAGE and push"
 	@echo "  make check-git-clean - Fail if working tree has uncommitted changes"
+	@echo "  OWNER=<github-owner> make push - Override GitHub owner (auto-lowercased for image path)"
 	@echo "  LOCAL_IMAGE=<ref> make build - Override local image reference"
 	@echo "  IMAGE=<ref> make push - Override target image reference"
 
