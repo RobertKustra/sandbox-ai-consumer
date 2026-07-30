@@ -1,14 +1,18 @@
-name: CI
+name: Build and push Docker image
 
 on:
   push:
-    branches: [ main ]
+    branches: [ development ]
   workflow_dispatch:  
+env:
+  OWNER_LC: ${{ github.repository_owner }}
 
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
+    
     steps:
-      - uses: actions/checkout@v4
-      - name: Run a script
-        run: echo "Hello from GitHub Actions!"
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for git operations
