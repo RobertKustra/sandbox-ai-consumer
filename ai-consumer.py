@@ -285,6 +285,5 @@ def main() -> int:
         task=lambda: run_single(args.base_url, args.model, args.prompt),
     )
 
-
 if __name__ == "__main__":
     raise SystemExit(main())
