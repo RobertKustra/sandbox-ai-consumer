@@ -16,6 +16,8 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     needs: [approval-main]
+    permissions:
+      contents: write
     if: ${{ always() && (github.ref_name == 'development' || needs.approval-main.result == 'success') }}
     steps:
       - name: Checkout code
@@ -45,7 +47,10 @@ jobs:
           password: ${{ secrets.GHCR_TOKEN }}
 
       - name: Build image reference
-        run: echo "IMAGE=$(make -s print-image TARGET_ENV="$TARGET_ENV" TARGET_TAG="$TARGET_TAG" OWNER="${{ github.repository_owner }}")" >> "$GITHUB_ENV"
+        run: |
+          IMAGE=$(make -s print-image TARGET_ENV="$TARGET_ENV" TARGET_TAG="$TARGET_TAG" OWNER="${{ github.repository_owner }}")
+          echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
+          echo "IMAGE=$IMAGE"
 
       - name: Check if image exists
         id: image_check
