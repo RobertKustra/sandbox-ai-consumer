@@ -7,6 +7,7 @@ on:
 
 env:
   OWNER_LC: ${{ github.repository_owner }}
+  ENV: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
 
 jobs:
   approval-main:
@@ -28,8 +29,8 @@ jobs:
         uses: tyriis/docker-image-tag-exists@v2.1.0
         with:
           registry: ghcr.io
-          repository: ${{ github.repository_owner }}/dev/sandbox-ai-consumer
-          tag: ${{ github.ref_name == 'development' && 'dev' || 'release' }}
+          repository: ${{ github.repository_owner.toLowerCase() }}/${{ env.ENV }}/sandbox-ai-consumer
+          tag: ${{ env.ENV }}
 
   build-and-push:
     runs-on: ubuntu-latest
