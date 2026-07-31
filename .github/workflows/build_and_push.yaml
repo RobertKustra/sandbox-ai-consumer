@@ -12,7 +12,7 @@ jobs:
   approval-main:
     runs-on: ubuntu-latest
     if: ${{ github.ref_name == 'main' }}
-    environment: release
+    environment: prod
     steps:
       - run: echo "Main branch approved"
 
