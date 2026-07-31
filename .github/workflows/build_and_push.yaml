@@ -1,0 +1,68 @@
+name: Build and push Docker image
+
+on:
+  push:
+    branches: [ development, main ]
+  workflow_dispatch:
+
+jobs:
+  approval-main:
+    runs-on: ubuntu-latest
+    if: ${{ github.ref_name == 'main' }}
+    environment: prod
+    steps:
+      - run: echo "Main branch approved"
+
+  build-and-push:
+    runs-on: ubuntu-latest
+    needs: [approval-main]
+    if: ${{ always() && (github.ref_name == 'development' || needs.approval-main.result == 'success') }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set target environment
+        run: |
+          if [ "${GITHUB_REF_NAME}" = "main" ]; then
+            echo "TARGET_ENV=prod" >> "$GITHUB_ENV"
+          else
+            echo "TARGET_ENV=dev" >> "$GITHUB_ENV"
+          fi
+
+      - name: Read target tag from Makefile
+        run: |
+          TARGET_TAG=$(make -s print-target-tag)
+          echo "TARGET_TAG=$TARGET_TAG" >> "$GITHUB_ENV"
+          echo "TARGET_TAG=$TARGET_TAG"
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN }}
+
+      - name: Build image reference
+        run: echo "IMAGE=$(make -s print-image TARGET_ENV="$TARGET_ENV" TARGET_TAG="$TARGET_TAG" OWNER="${{ github.repository_owner }}")" >> "$GITHUB_ENV"
+
+      - name: Check if image exists
+        id: image_check
+        run: |
+          if docker manifest inspect "$IMAGE" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Show Envs
+        run: echo $GITHUB_ENV
+
+      - name: Build and push Docker image using Makefile
+        if: ${{ steps.image_check.outputs.exists == 'false' }}
+        run: make push
+        env:
+          DOCKER_BUILDKIT: 1
+          OWNER: ${{ github.repository_owner }}
+          TARGET_ENV: ${{ env.TARGET_ENV }}
+          TARGET_TAG: ${{ env.TARGET_TAG }}
