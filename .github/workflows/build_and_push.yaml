@@ -32,7 +32,10 @@ jobs:
           fi
 
       - name: Read target tag from Makefile
-        run: echo "TARGET_TAG=$(make -s print-target-tag)" >> "$GITHUB_ENV"
+        run: |
+          TARGET_TAG=$(make -s print-target-tag)
+          echo "TARGET_TAG=$TARGET_TAG" >> "$GITHUB_ENV"
+          echo "TARGET_TAG=$TARGET_TAG"
 
       - name: Login to GHCR
         uses: docker/login-action@v3
@@ -52,7 +55,9 @@ jobs:
           else
             echo "exists=false" >> "$GITHUB_OUTPUT"
           fi
-
+      - name: Show Envs
+        run: echo $GITHUB_ENV
+        
       - name: Build and push Docker image using Makefile
         if: ${{ steps.image_check.outputs.exists == 'false' }}
         run: make push
