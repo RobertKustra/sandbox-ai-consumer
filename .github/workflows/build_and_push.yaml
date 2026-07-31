@@ -33,7 +33,7 @@ jobs:
 
   build-and-push:
     runs-on: ubuntu-latest
-    needs: [approval-main]
+    needs: [approval-main, check-image-tag]
     if: ${{ always() && (github.ref_name == 'development' || needs.approval-main.result == 'success') }}
     steps:
       - name: Checkout code
