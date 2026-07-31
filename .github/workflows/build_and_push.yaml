@@ -55,7 +55,6 @@ jobs:
           else
             echo "exists=false" >> "$GITHUB_OUTPUT"
           fi
-          echo "Image exists: $GITHUB_OUTPUT"
       - name: Show Envs
         run: echo $GITHUB_ENV
 
