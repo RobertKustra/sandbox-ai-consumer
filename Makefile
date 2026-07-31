@@ -1,9 +1,10 @@
 
 LOCAL_IMAGE ?= local:latest
-TARGET_TAG ?= v0.2.1
+TARGET_TAG ?= 0.2.1
+TARGET_ENV ?= dev
 OWNER ?= RobertKustra
 OWNER_LC := $(shell printf '%s' "$(OWNER)" | tr '[:upper:]' '[:lower:]')
-IMAGE ?= ghcr.io/$(OWNER_LC)/dev/sandbox-ai-consumer:$(TARGET_TAG)
+IMAGE ?= ghcr.io/$(OWNER_LC)/$(TARGET_ENV)/sandbox-ai-consumer:$(TARGET_TAG)
 
 .PHONY: help check-git-clean build push
 
@@ -15,6 +16,8 @@ help:
 	@echo "  OWNER=<github-owner> make push - Override GitHub owner (auto-lowercased for image path)"
 	@echo "  LOCAL_IMAGE=<ref> make build - Override local image reference"
 	@echo "  IMAGE=<ref> make push - Override target image reference"
+	@echo "  TARGET_ENV=<env> make push - Override target environment in image path"
+	@echo "  TARGET_TAG=<tag> make push - Override image tag"
 
 check-git-clean:
 	@if [ -n "$(shell git status --porcelain)" ]; then \
