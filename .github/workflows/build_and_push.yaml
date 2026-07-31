@@ -55,9 +55,10 @@ jobs:
           else
             echo "exists=false" >> "$GITHUB_OUTPUT"
           fi
+          echo "Image exists: $GITHUB_OUTPUT"
       - name: Show Envs
         run: echo $GITHUB_ENV
-        
+
       - name: Build and push Docker image using Makefile
         if: ${{ steps.image_check.outputs.exists == 'false' }}
         run: make push
