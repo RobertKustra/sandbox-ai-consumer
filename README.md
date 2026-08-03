@@ -89,19 +89,23 @@ Run stress mode:
 
 Code changes must follow this promotion path:
 
-`feature/*` -> `development` -> `main`
+`feat/*` or `feature/*` -> `development` -> `main`
 
 Rules:
 
 - Create all changes on a feature branch.
-- Open a Pull Request from `feature/*` to `development`.
+- Open a Pull Request from `feat/*` or `feature/*` to `development`.
 - After validation on `development`, open a Pull Request from `development` to `main`.
 - Direct pushes to `development` and `main` are blocked by branch protection.
-- PRs targeting `development` are validated by workflow `Validate PR source for development`, which fails unless source branch matches `feature/*`.
+- PRs targeting `development` and `main` are validated by workflow `Validate PR source policy`.
+- `development` accepts only `feat/*` or `feature/*` as source branches.
+- `main` accepts only `development` as source branch.
 
 This ensures every change is reviewed and promoted through the expected environments before release.
 
-To fully enforce this rule, set `Validate PR source for development / enforce-feature-source` as a required status check in branch protection for `development`.
+To fully enforce this rule, set `Validate PR source policy / enforce-source-policy` as a required status check in branch protection for both `development` and `main`.
+
+For full contribution rules, see `CONTRIBUTING.md`.
 
 ### Pull Request checklist
 

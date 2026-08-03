@@ -1,21 +1,35 @@
-name: Validate PR source for development
+name: Validate PR source policy
 
 on:
   pull_request:
-    branches: [ development ]
+    branches: [ development, main ]
     types: [opened, synchronize, reopened, ready_for_review]
 
 permissions:
   contents: read
 
 jobs:
-  enforce-feature-source:
+  enforce-source-policy:
     runs-on: ubuntu-latest
     steps:
-      - name: Ensure source branch matches feat/*
+      - name: Ensure source branch matches promotion policy
         run: |
-          if [[ "${{ github.head_ref }}" != feat/* ]]; then
-            echo "Only feat/* branches can be merged into development."
-            echo "Current source branch: ${{ github.head_ref }}"
+          BASE_REF="${{ github.base_ref }}"
+          HEAD_REF="${{ github.head_ref }}"
+
+          if [[ "$BASE_REF" == "development" ]]; then
+            if [[ "$HEAD_REF" != feat/* && "$HEAD_REF" != feature/* ]]; then
+              echo "Only feat/* or feature/* branches can be merged into development."
+              echo "Current source branch: $HEAD_REF"
+              exit 1
+            fi
+          elif [[ "$BASE_REF" == "main" ]]; then
+            if [[ "$HEAD_REF" != "development" ]]; then
+              echo "Only development can be merged into main."
+              echo "Current source branch: $HEAD_REF"
+              exit 1
+            fi
+          else
+            echo "Unsupported target branch: $BASE_REF"
             exit 1
           fi
