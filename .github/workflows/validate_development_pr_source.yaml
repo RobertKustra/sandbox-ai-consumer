@@ -1,0 +1,21 @@
+name: Validate PR source for development
+
+on:
+  pull_request:
+    branches: [ development ]
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+
+jobs:
+  enforce-feature-source:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ensure source branch matches feat/*
+        run: |
+          if [[ "${{ github.head_ref }}" != feat/* ]]; then
+            echo "Only feat/* branches can be merged into development."
+            echo "Current source branch: ${{ github.head_ref }}"
+            exit 1
+          fi
