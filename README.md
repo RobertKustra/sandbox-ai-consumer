@@ -84,3 +84,28 @@ Run single request:
 Run stress mode:
 
 `docker run --rm sandbox-ai-consumer:0.1.0 --stress --count 10 --parallel 4`
+
+## Branch flow and merge policy
+
+Code changes must follow this promotion path:
+
+`feature/*` -> `development` -> `main`
+
+Rules:
+
+- Create all changes on a feature branch.
+- Open a Pull Request from `feature/*` to `development`.
+- After validation on `development`, open a Pull Request from `development` to `main`.
+- Direct pushes to `development` and `main` are blocked by branch protection.
+
+This ensures every change is reviewed and promoted through the expected environments before release.
+
+### Pull Request checklist
+
+Before merging any PR:
+
+- CI checks are green.
+- At least one approval is present.
+- PR description explains scope, risk, and rollback approach.
+- For runtime-impacting changes, include test evidence (logs, screenshots, or command output).
+- No direct merge to `main` from `feature/*` branches; promote through `development` first.
