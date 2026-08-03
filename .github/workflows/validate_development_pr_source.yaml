@@ -12,10 +12,10 @@ jobs:
   enforce-feature-source:
     runs-on: ubuntu-latest
     steps:
-      - name: Ensure source branch matches feature/*
+      - name: Ensure source branch matches feat/*
         run: |
-          if [[ "${{ github.head_ref }}" != feature/* ]]; then
-            echo "Only feature/* branches can be merged into development."
+          if [[ "${{ github.head_ref }}" != feat/* ]]; then
+            echo "Only feat/* branches can be merged into development."
             echo "Current source branch: ${{ github.head_ref }}"
             exit 1
           fi
