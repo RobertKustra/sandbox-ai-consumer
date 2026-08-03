@@ -97,8 +97,11 @@ Rules:
 - Open a Pull Request from `feature/*` to `development`.
 - After validation on `development`, open a Pull Request from `development` to `main`.
 - Direct pushes to `development` and `main` are blocked by branch protection.
+- PRs targeting `development` are validated by workflow `Validate PR source for development`, which fails unless source branch matches `feature/*`.
 
 This ensures every change is reviewed and promoted through the expected environments before release.
+
+To fully enforce this rule, set `Validate PR source for development / enforce-feature-source` as a required status check in branch protection for `development`.
 
 ### Pull Request checklist
 
