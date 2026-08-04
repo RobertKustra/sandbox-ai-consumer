@@ -83,6 +83,8 @@ This repository uses GitHub Actions workflows defined in `.github/workflows`:
 
 These workflows are part of the release and branch-protection process described below.
 
+For Flux-based deployments, the cluster configuration repository also contains image automation resources that monitor the GHCR images published by this workflow and can update the values used by Flux in the `dev` and `prod` overlays.
+
 ## Docker commands
 
 Build and push without Make:
