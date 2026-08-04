@@ -63,6 +63,23 @@ Override image references:
 - `OWNER=RobertKustra make push`
 - `IMAGE=ghcr.io/my-org/sandbox-ai-consumer:0.1.0 make push`
 
+## CI/CD pipelines
+
+This repository uses GitHub Actions workflows defined in `.github/workflows`:
+
+- `Build and push Docker image` (`build_and_push.yaml`)
+  - Runs on pushes to `development` and `main`, and can also be started manually with `workflow_dispatch`.
+  - Builds and pushes the container image to GHCR for the target environment (`dev` on `development`, `prod` on `main`).
+  - Uses the Make-based build/push flow and skips duplicate image publication when the target image already exists.
+  - On `main`, it also creates a release git tag in the form `v<version>` after a successful image push.
+
+- `Validate PR source policy` (`validate_development_pr_source.yaml`)
+  - Runs on pull requests targeting `development` and `main`.
+  - Enforces the repository promotion policy by rejecting invalid source branches.
+  - `feat/*` and `feature/*` branches can target `development`, while only `development` can target `main`.
+
+These workflows are part of the release and branch-protection process described below.
+
 ## Docker commands
 
 Build and push without Make:
