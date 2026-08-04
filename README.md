@@ -69,9 +69,12 @@ This repository uses GitHub Actions workflows defined in `.github/workflows`:
 
 - `Build and push Docker image` (`build_and_push.yaml`)
   - Runs on pushes to `development` and `main`, and can also be started manually with `workflow_dispatch`.
-  - Builds and pushes the container image to GHCR for the target environment (`dev` on `development`, `prod` on `main`).
-  - Uses the Make-based build/push flow and skips duplicate image publication when the target image already exists.
-  - On `main`, it also creates a release git tag in the form `v<version>` after a successful image push.
+  - Starts with `actions/checkout` to fetch the repository history needed by the build logic.
+  - Determines the target environment (`dev` for `development`, `prod` for `main`) and reads the image tag from the Makefile.
+  - Logs in to GHCR using the `GHCR_TOKEN` secret so the workflow can publish the image.
+  - Builds the full image reference from the Makefile and checks whether that image already exists in GHCR.
+  - If the image is missing, it runs the Make-based `make push` flow to build and publish the container image.
+  - For `main` branch builds, it creates a Git tag like `v<version>` after a successful push to mark the release.
 
 - `Validate PR source policy` (`validate_development_pr_source.yaml`)
   - Runs on pull requests targeting `development` and `main`.
