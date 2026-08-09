@@ -4,7 +4,7 @@
 
 This repository uses a staged promotion flow:
 
-`feat/*` or `feature/*` -> `development` -> `main`
+`feat/*` or `feature/*` -> `development` -> `main` with `realse` tag
 
 ## Required merge path
 
