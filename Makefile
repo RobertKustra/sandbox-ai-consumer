@@ -1,5 +1,5 @@
 LOCAL_IMAGE ?= local:latest
-TARGET_TAG ?= 1.0.2
+TARGET_TAG ?= 1.0.6
 TARGET_ENV ?= dev
 OWNER ?= RobertKustra
 OWNER_LC := $(shell printf '%s' "$(OWNER)" | tr '[:upper:]' '[:lower:]')
