@@ -1,5 +1,6 @@
 import importlib.util
 import json
+import sys
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -9,6 +10,7 @@ SPEC = importlib.util.spec_from_file_location(
     "ai_consumer", Path(__file__).with_name("ai-consumer.py")
 )
 MODULE = importlib.util.module_from_spec(SPEC)
+sys.modules[SPEC.name] = MODULE
 SPEC.loader.exec_module(MODULE)
 
 
