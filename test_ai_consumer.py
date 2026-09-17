@@ -2,6 +2,7 @@ import importlib.util
 import json
 import sys
 import unittest
+from contextlib import nullcontext
 from pathlib import Path
 from unittest.mock import patch
 
@@ -41,6 +42,19 @@ class FakeLangfuse:
 
 
 class AiConsumerTest(unittest.TestCase):
+    @patch.dict(
+        MODULE.os.environ,
+        {"LANGFUSE_PUBLIC_KEY": "public", "LANGFUSE_SECRET_KEY": "secret"},
+        clear=True,
+    )
+    def test_langfuse_uses_cluster_url_by_default(self):
+        with patch.dict(sys.modules, {"langfuse": type("Sdk", (), {"get_client": lambda: object()})}):
+            MODULE.create_langfuse_client()
+
+        self.assertEqual(
+            MODULE.os.environ["LANGFUSE_BASE_URL"], MODULE.DEFAULT_LANGFUSE_BASE_URL
+        )
+
     def test_extract_usage_maps_openai_fields(self):
         body = json.dumps(
             {"usage": {"prompt_tokens": 4, "completion_tokens": 7, "total_tokens": 11}}

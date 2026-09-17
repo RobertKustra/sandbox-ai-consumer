@@ -17,6 +17,7 @@ from typing import Any, Dict
 
 DEFAULT_PROMPT = "Who are you?, and what can you do?"
 DEFAULT_BASE_URL = "http://127.0.0.1:8000"
+DEFAULT_LANGFUSE_BASE_URL = "http://langfuse-web.langfuse.svc.cluster.local:3000"
 DEFAULT_MODEL = "Qwen/Qwen2.5-Coder-3B-Instruct"
 LOGGER = logging.getLogger("vllm_request")
 ENV_FILE = ".env"
@@ -117,6 +118,8 @@ def create_langfuse_client() -> Any | None:
     if not os.getenv("LANGFUSE_PUBLIC_KEY") or not os.getenv("LANGFUSE_SECRET_KEY"):
         LOGGER.info("Langfuse tracing disabled: credentials are not configured")
         return None
+
+    os.environ.setdefault("LANGFUSE_BASE_URL", DEFAULT_LANGFUSE_BASE_URL)
 
     from langfuse import get_client
 
