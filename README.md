@@ -15,6 +15,12 @@ Supported variables:
 - `VLLM_COUNT`
 - `VLLM_PARALLEL`
 - `VLLM_REPEAT_MINUTES` (`0` disables repeating)
+- `LANGFUSE_BASE_URL`
+- `LANGFUSE_PUBLIC_KEY`
+- `LANGFUSE_SECRET_KEY`
+- `LANGFUSE_TRACING_ENVIRONMENT`
+
+Langfuse tracing is enabled only when both key variables are set. Every vLLM request creates a trace with a generation containing the model, prompt, response, HTTP status, and token usage returned by vLLM.
 
 Example `.env`:
 
@@ -26,6 +32,10 @@ VLLM_STRESS=false
 VLLM_COUNT=50
 VLLM_PARALLEL=8
 VLLM_REPEAT_MINUTES=0
+LANGFUSE_BASE_URL=http://localhost:3000
+LANGFUSE_PUBLIC_KEY=pk-lf-example
+LANGFUSE_SECRET_KEY=sk-lf-example
+LANGFUSE_TRACING_ENVIRONMENT=dev
 ```
 
 You can also use a custom file path:
@@ -44,9 +54,9 @@ Repeat execution examples:
 
 Default image references:
 
-- Local build tag: `sandbox-ai-consumer:0.1.0`
+- Local build tag: `sandbox-ai-consumer:2.0.0`
 - GitHub owner: `RobertKustra`
-- Push target tag: `ghcr.io/robertkustra/dev/sandbox-ai-consumer:0.1.0` (lowercase required by Docker image naming)
+- Push target tag: `ghcr.io/robertkustra/dev/sandbox-ai-consumer:2.0.0` (lowercase required by Docker image naming)
 
 Available targets:
 
@@ -61,25 +71,25 @@ Override image references:
 
 - `LOCAL_IMAGE=my-local-tag:latest make build`
 - `OWNER=RobertKustra make push`
-- `IMAGE=ghcr.io/my-org/sandbox-ai-consumer:0.1.0 make push`
+- `IMAGE=ghcr.io/my-org/sandbox-ai-consumer:2.0.0 make push`
 
 ## Docker commands
 
 Build and push without Make:
 
-`docker build -t sandbox-ai-consumer:0.1.0 .`
+`docker build -t sandbox-ai-consumer:2.0.0 .`
 
-`docker tag sandbox-ai-consumer:0.1.0 ghcr.io/robertkustra/dev/sandbox-ai-consumer:0.1.0`
+`docker tag sandbox-ai-consumer:2.0.0 ghcr.io/robertkustra/dev/sandbox-ai-consumer:2.0.0`
 
-`docker push ghcr.io/robertkustra/dev/sandbox-ai-consumer:0.1.0`
+`docker push ghcr.io/robertkustra/dev/sandbox-ai-consumer:2.0.0`
 
 Run help:
 
-`docker run --rm sandbox-ai-consumer:0.1.0 --help`
+`docker run --rm sandbox-ai-consumer:2.0.0 --help`
 
 Run single request:
 
-`docker run --rm sandbox-ai-consumer:0.1.0 -u http://host.docker.internal:8000 -p "Test prompt"`
+`docker run --rm sandbox-ai-consumer:2.0.0 -u http://host.docker.internal:8000 -p "Test prompt"`
 
 Run stress mode:
 
